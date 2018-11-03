@@ -1,4 +1,4 @@
-package test
+package schema
 
 import (
 	"bytes"
@@ -7,14 +7,12 @@ import (
 	"net/http"
 
 	"github.com/graphql-go/graphql"
-	"github.com/graphql-go/handler"
 )
 
 var ACCESS_TOKEN string = "0c9de60ed26319d172042037ae22195e"
 var URL string = "https://api.vimeo.com/"
 
-func TestFunction() {
-	// Schema
+func GetSchema() graphql.Schema {
 	fields := graphql.Fields{
 		"video": &graphql.Field{
 			Type: graphql.String,
@@ -46,28 +44,5 @@ func TestFunction() {
 	if err != nil {
 		log.Fatalf("failed to create new schema, error: %v", err)
 	}
-
-	// Query
-	query := `
-		{
-			video(title: "test")
-		}`
-
-	params := graphql.Params{Schema: schema, RequestString: query}
-	r := graphql.Do(params)
-
-	if len(r.Errors) > 0 {
-		log.Fatalf("failed to execute graphql operation, errors: %+v", r.Errors)
-	}
-
-	fmt.Printf("%s \n", r) // {“data”:{“hello”:”world”}}
-
-	h := handler.New(&handler.Config{
-		Schema:   &schema,
-		Pretty:   true,
-		GraphiQL: true,
-	})
-
-	http.Handle("/graphql", h)
-	http.ListenAndServe(":8080", nil)
+	return schema
 }

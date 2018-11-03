@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/handler"
 )
 
 func TestFunction() {
@@ -40,4 +42,13 @@ func TestFunction() {
 	}
 	rJSON, _ := json.Marshal(r)
 	fmt.Printf("%s \n", rJSON) // {“data”:{“hello”:”world”}}
+
+	h := handler.New(&handler.Config{
+			Schema: &schema,
+			Pretty: true,
+			GraphiQL: true,
+	})
+
+	http.Handle("/graphql", h)
+	http.ListenAndServe(":8080", nil)
 }

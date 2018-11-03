@@ -18,7 +18,9 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 
 		data := result.Data.(map[string]interface{})
-		fmt.Fprintf(w, data["video"].(string))
+		for _,v := range data{
+			fmt.Fprintf(w, v.(string))
+		}
 	})
 
 	http.ListenAndServe(":8080", nil)

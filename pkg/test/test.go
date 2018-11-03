@@ -1,7 +1,7 @@
 package test
 
 import (
-	"encoding/json"
+	"bytes"
 	"fmt"
 	"log"
 	"net/http"
@@ -19,17 +19,23 @@ func TestFunction() {
 		"video": &graphql.Field{
 			Type: graphql.String,
 			Args: graphql.FieldConfigArgument{
-					"title": &graphql.ArgumentConfig{
-						Type: graphql.String,
-					},
+				"title": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				fmt.Printf("Hi %s", p.Args["title"].(string))
 				url := URL + "videos?query=" + p.Args["title"].(string) + "&per_page=4"
 				client := &http.Client{}
 				req, _ := http.NewRequest("GET", url, nil)
-				req.Header.Set("Authorization", "Bearer " + ACCESS_TOKEN)
-				res, error := client.Do(req)
-				return res, error
+				req.Header.Set("Authorization", "Bearer "+ACCESS_TOKEN)
+				req.Header.Set("Accept", "application/json")
+				res, err := client.Do(req)
+				buf := new(bytes.Buffer)
+				buf.ReadFrom(res.Body)
+				newStr := buf.String()
+
+				return newStr, err
 			},
 		},
 	}
@@ -54,13 +60,12 @@ func TestFunction() {
 		log.Fatalf("failed to execute graphql operation, errors: %+v", r.Errors)
 	}
 
-	rJSON, _ := json.Marshal(r)
-	fmt.Printf("%s \n", rJSON) // {“data”:{“hello”:”world”}}
+	fmt.Printf("%s \n", r) // {“data”:{“hello”:”world”}}
 
 	h := handler.New(&handler.Config{
-			Schema: &schema,
-			Pretty: true,
-			GraphiQL: true,
+		Schema:   &schema,
+		Pretty:   true,
+		GraphiQL: true,
 	})
 
 	http.Handle("/graphql", h)

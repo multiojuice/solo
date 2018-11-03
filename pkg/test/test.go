@@ -10,13 +10,26 @@ import (
 	"github.com/graphql-go/handler"
 )
 
+var ACCESS_TOKEN string = "0c9de60ed26319d172042037ae22195e"
+var URL string = "https://api.vimeo.com/"
+
 func TestFunction() {
 	// Schema
 	fields := graphql.Fields{
-		"hello": &graphql.Field{
+		"video": &graphql.Field{
 			Type: graphql.String,
+			Args: graphql.FieldConfigArgument{
+					"title": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				return "world", nil
+				url := URL + "videos?query=" + p.Args["title"].(string) + "&per_page=4"
+				client := &http.Client{}
+				req, _ := http.NewRequest("GET", url, nil)
+				req.Header.Set("Authorization", "Bearer " + ACCESS_TOKEN)
+				res, error := client.Do(req)
+				return res, error
 			},
 		},
 	}
@@ -31,7 +44,7 @@ func TestFunction() {
 	// Query
 	query := `
 		{
-			hello
+			video(title: "test")
 		}`
 
 	params := graphql.Params{Schema: schema, RequestString: query}
@@ -40,6 +53,7 @@ func TestFunction() {
 	if len(r.Errors) > 0 {
 		log.Fatalf("failed to execute graphql operation, errors: %+v", r.Errors)
 	}
+
 	rJSON, _ := json.Marshal(r)
 	fmt.Printf("%s \n", rJSON) // {“data”:{“hello”:”world”}}
 

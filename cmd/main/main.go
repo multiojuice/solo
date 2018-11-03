@@ -1,6 +1,6 @@
 package main
 
-import "../../pkg/test"
+import "github.com/multiojuice/solo/pkg/test"
 
 func main() {
 	test.TestFunction()

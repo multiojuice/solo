@@ -1,11 +1,10 @@
 package schema
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"net/http"
-
+	"io/ioutil"
 	"github.com/graphql-go/graphql"
 )
 
@@ -26,14 +25,13 @@ func GetSchema() graphql.Schema {
 				url := URL + "videos?query=" + p.Args["title"].(string) + "&per_page=4"
 				client := &http.Client{}
 				req, _ := http.NewRequest("GET", url, nil)
+
 				req.Header.Set("Authorization", "Bearer "+ACCESS_TOKEN)
 				req.Header.Set("Accept", "application/json")
-				res, err := client.Do(req)
-				buf := new(bytes.Buffer)
-				buf.ReadFrom(res.Body)
-				newStr := buf.String()
 
-				return newStr, err
+				res, err := client.Do(req)
+				bodyBytes, _ := ioutil.ReadAll(res.Body)
+				return string(bodyBytes), err
 			},
 		},
 	}

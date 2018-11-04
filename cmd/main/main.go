@@ -9,6 +9,10 @@ import (
 	"github.com/multiojuice/solo/pkg/schema"
 )
 
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
 func main() {
 
 	http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
@@ -17,11 +21,8 @@ func main() {
 		result := controller.HandleQuery(string(body), mainSchema)
 		w.Header().Set("Content-Type", "application/json")
 		// w.Header().Set("")
-
-		data := result.Data.(map[string]interface{})
-		for _, v := range data {
-			fmt.Fprint(w, v.(string))
-		}
+		enableCors(&w)
+		fmt.Fprint(w, string(result))
 	})
 
 	http.ListenAndServe(":8080", nil)

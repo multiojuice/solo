@@ -2,12 +2,12 @@ package controller
 
 import (
 	"fmt"
-
+	"encoding/json"
 	"github.com/graphql-go/graphql"
 )
 
 // HandleQuery: To handle every query
-func HandleQuery(query string, schema graphql.Schema) *graphql.Result {
+func HandleQuery(query string, schema graphql.Schema) []byte {
 	result := graphql.Do(graphql.Params{
 		Schema:        schema,
 		RequestString: query,
@@ -15,5 +15,7 @@ func HandleQuery(query string, schema graphql.Schema) *graphql.Result {
 	if len(result.Errors) > 0 {
 		fmt.Printf("wrong result, unexpected errors: %v", result.Errors)
 	}
-	return result
+
+	rJson, _ := json.Marshal(result)
+	return rJson
 }

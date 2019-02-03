@@ -12,7 +12,23 @@ class Query(graphene.ObjectType):
     def resolve_hello(self, info):
         return 'World'
 
-schema = graphene.Schema(query=Query)
+class ChangeFile(graphene.Mutation):
+    class Arguments:
+        name = graphene.String(required=True)
+        text = graphene.String(required=True)
+
+    ok=graphene.Boolean()
+
+    def mutate(self, info, name, text):
+        with open(name, 'w') as opened_file:
+            opened_file.write(text)
+        ok = True
+        return ChangeFile(ok=ok)
+
+class Mutation(graphene.ObjectType):
+    change_file = ChangeFile.Field()
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
 
 app.add_url_rule(
     '/graphql',

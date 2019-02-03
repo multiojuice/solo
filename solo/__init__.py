@@ -1,6 +1,11 @@
+import os
+import csh_ldap
 import graphene
 from flask_graphql import GraphQLView
 from flask import Flask
+
+# LDAP initialization
+_ldap = csh_ldap.CSHLDAP(os.environ['LDAP_BIND_DN'], os.environ['LDAP_BIND_PASS'])
 
 # app initialization
 app = Flask(__name__)

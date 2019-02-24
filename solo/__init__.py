@@ -15,7 +15,9 @@ class Query(graphene.ObjectType):
     hello = graphene.String(description='A typical hello world')
 
     def resolve_hello(self, info):
-        return 'World'
+        o = _ldap.get_member('owen', uid=True)
+        print(o.cn)
+        return "owen"
 
 class ChangeFile(graphene.Mutation):
     class Arguments:
